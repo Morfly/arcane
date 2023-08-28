@@ -5,5 +5,11 @@ pluginManagement {
     }
     
 }
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "arcane"
 
+include(
+    ":arcane-compiler",
+    ":arcane-runtime"
+)
