@@ -20,6 +20,5 @@ tasks.test {
 }
 
 dependencies {
-    implementation(projects.arcaneAnnotations)
     testImplementation(kotlin("test"))
 }

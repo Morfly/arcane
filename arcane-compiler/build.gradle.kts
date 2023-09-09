@@ -9,6 +9,8 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://www.jetbrains.com/intellij-repository/releases")
+    maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
 }
 
 tasks.withType<KotlinCompile> {
@@ -16,5 +18,7 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
+    implementation(projects.arcaneAnnotations)
     compileOnly(kotlin("compiler-embeddable"))
+    compileOnly("com.jetbrains.intellij.platform:core:232.9559.62")
 }

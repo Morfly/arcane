@@ -11,5 +11,6 @@ rootProject.name = "arcane"
 
 include(
     ":arcane-compiler",
-    ":arcane-runtime"
+    ":arcane-runtime",
+    ":arcane-annotations",
 )

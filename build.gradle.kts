@@ -14,6 +14,10 @@ repositories {
 
 dependencies {
     kotlinCompilerPluginClasspath(projects.arcaneCompiler)
+
+    implementation(projects.arcaneRuntime)
+    implementation(projects.arcaneAnnotations)
+
     testImplementation(kotlin("test"))
 }
 

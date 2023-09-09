@@ -1,8 +1,21 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+import io.morfly.arcane.Template
+import io.morfly.arcane.QuoteContent
+import io.morfly.arcane.runtime.Quote
+import io.morfly.arcane.runtime.quote
+import io.morfly.arcane.runtime.splice
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
-//    helloWorld()
+fun main(args: Array<String>) {
+
+//    @QuoteContent("s")
+    quote {
+        splice {
+            println("TEST")
+            quote @QuoteContent("") {  }
+        }
+    }
+}
+
+@Template
+fun Quote.mytemplate(arg: String) {
+
 }
