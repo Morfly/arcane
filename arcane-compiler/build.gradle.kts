@@ -21,4 +21,8 @@ dependencies {
     implementation(projects.arcaneAnnotations)
     compileOnly(kotlin("compiler-embeddable"))
     compileOnly("com.jetbrains.intellij.platform:core:232.9559.62")
+
+    testImplementation(kotlin("test-junit"))
+    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
 }
