@@ -26,31 +26,9 @@ import java.io.File
 
 class ArcaneIrExtension : IrGenerationExtension, IrElementVisitorVoid {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-//        moduleFragment.acceptVoid(this)
+        moduleFragment.acceptVoid(this)
 
-        val typeNullableAny = pluginContext.irBuiltIns.anyNType
-        val typeUnit = pluginContext.irBuiltIns.unitType
 
-        val funPrintln = pluginContext.referenceFunctions(CallableId(FqName("kotlin.io"), Name.identifier("println")))
-            .single {
-                val parameters = it.owner.valueParameters
-                parameters.size == 1 && parameters[0].type == typeNullableAny
-            }
-
-        val funMain = pluginContext.irFactory.buildFun {
-            name = Name.identifier("main")
-            visibility = DescriptorVisibilities.PUBLIC
-            modality = Modality.FINAL
-            returnType = typeUnit
-        }
-
-        funMain.body = DeclarationIrBuilder(pluginContext, funMain.symbol).irBlockBody {
-            val callPrintln = irCall(funPrintln)
-            callPrintln.putValueArgument(0, irString("Hello, world!"))
-            +callPrintln
-        }
-
-        println(funMain.dump())
     }
 
     override fun visitElement(element: IrElement) {
@@ -58,6 +36,7 @@ class ArcaneIrExtension : IrGenerationExtension, IrElementVisitorVoid {
     }
 
     override fun visitFile(declaration: IrFile) {
+        println("TTAGG file: ${declaration.fqName}")
         val transformer = QuoteTransformingVisitor()
         transformer.visitFile(declaration)
     }

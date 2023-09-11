@@ -17,6 +17,6 @@ class ArcanePluginRegistrar : CompilerPluginRegistrar() {
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         FirExtensionRegistrarAdapter.registerExtension(ArcaneFirExtensionRegistrar())
         IrGenerationExtension.registerExtension(ArcaneIrExtension())
-        IrGenerationExtension.registerExtension(DebugLogExtension())
+//        IrGenerationExtension.registerExtension(DebugLogExtension())
     }
 }
