@@ -33,7 +33,7 @@ class QuoteTransformer(
     private val pluginContext: IrPluginContext,
 ) : IrElementTransformerVoidWithContext(), FileLoweringPass {
 
-    private lateinit var file: File
+    private lateinit var file: IrFile
     private lateinit var fileSource: String
 
     private val quoteType = pluginContext
@@ -42,18 +42,11 @@ class QuoteTransformer(
     private val quoteCodeSetter = quoteType.getSimpleFunction("addCode")
 
     override fun lower(irFile: IrFile) {
-        file = File(irFile.path)
-        fileSource = file.readText()
+        file = irFile
+        fileSource = File(irFile.path).readText()
         println("TTAGG file: ${file.path}")
         println("TTAGG fileSource: ${fileSource}")
         irFile.transformChildrenVoid()
-    }
-
-
-    override fun visitFileNew(declaration: IrFile): IrFile {
-        file = File(declaration.path)
-        fileSource = file.readText()
-        return super.visitFileNew(declaration)
     }
 
     override fun visitCall(expression: IrCall): IrExpression {
@@ -84,10 +77,15 @@ class QuoteTransformer(
         val body = expression.function.body as? IrBlockBody ?: return expression
 
         val loweredBody = DeclarationIrBuilder(pluginContext, expression.function.symbol).irBlockBody {
+            val rangeInfo = file.fileEntry.getSourceRangeInfo(expression.startOffset + 1, expression.endOffset - 1)
+            val startIndent = " ".repeat(rangeInfo.startColumnNumber)
+
+            val code = startIndent + fileSource.substring(rangeInfo.startOffset, rangeInfo.endOffset)
+
             val callSetter = irCall(quoteCodeSetter!!.owner).apply {
                 dispatchReceiver = irGet(expression.function.extensionReceiverParameter!!)
             }
-            callSetter.putValueArgument(0, irString("Hello, world!"))
+            callSetter.putValueArgument(0,  irString(code.trimIndent().trimEnd()))
             +callSetter
         }
         loweredBody.statements += body.statements
