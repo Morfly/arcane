@@ -6,7 +6,11 @@ class Quote(internal val parent: Splice?) {
     var code: String? = null
 
     fun addCode(code: String) {
-        this.code = code
+        if (this.code == null) {
+            this.code = code
+        } else {
+            error("TODO")
+        }
     }
 }
 

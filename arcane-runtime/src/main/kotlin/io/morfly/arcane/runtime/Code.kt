@@ -3,17 +3,16 @@ package io.morfly.arcane.runtime
 import io.morfly.arcane.Template
 
 class Code<T> internal constructor(
-    val quote: Quote,
-    val template: @Template Quote.() -> T
+    private val quote: Quote,
+    private val template: @Template Quote.() -> T
 ) {
+    val text: String
+        get() = quote.run {
+            template()
+            code!!
+        }
 
-    fun evaluate(): T {
-        return quote.template()
-    }
+    fun evaluate(): T = quote.template()
 
     operator fun invoke(): T = evaluate()
-
-    fun asString(): String {
-        return quote.code ?: error("code was null")
-    }
 }
