@@ -3,10 +3,9 @@ import io.morfly.arcane.runtime.splice
 
 fun test() {
     val code = quote {
-        // addCode("val s = 5")
+
 
         var s = 5
-        // sss
         s = 5
 
 

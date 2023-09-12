@@ -85,7 +85,7 @@ class QuoteTransformer(
             val callSetter = irCall(quoteCodeSetter!!.owner).apply {
                 dispatchReceiver = irGet(expression.function.extensionReceiverParameter!!)
             }
-            callSetter.putValueArgument(0,  irString(code.trimIndent().trimEnd()))
+            callSetter.putValueArgument(0,  irString(code.trimIndent().trim('\n')))
             +callSetter
         }
         loweredBody.statements += body.statements
