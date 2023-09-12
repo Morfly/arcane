@@ -3,7 +3,11 @@ package io.morfly.arcane.runtime
 import io.morfly.arcane.Template
 
 class Quote(internal val parent: Splice?) {
-    var code: (() -> String)? = null
+    var code: String? = null
+
+    fun addCode(code: String) {
+        this.code = code
+    }
 }
 
 fun <R> quote(block: @Template Quote.() -> R): Code<R> {
