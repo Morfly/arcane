@@ -24,8 +24,7 @@ class ArcaneIrExtension : IrGenerationExtension, IrElementVisitorVoid {
     override fun visitFile(declaration: IrFile) {
         println("TTAGG file: ${declaration.fqName}")
 
-        val transformer = QuoteTransformer(pluginContext = pluginContext)
-        transformer.lower(declaration)
+        QuoteTransformer(pluginContext, declaration).lower()
 
 //        val transformer = QuoteTransformingVisitor()
 //        transformer.visitFile(declaration)
