@@ -6,13 +6,17 @@ class Code<T> internal constructor(
     private val quote: Quote,
     private val template: @Template Quote.() -> T
 ) {
+
+    private val value: T by lazy {
+        quote.template()
+    }
     val text: String
-        get() = quote.run {
-            template()
-            code!!
+        get() {
+            value
+            return quote.code!!
         }
 
-    fun evaluate(): T = quote.template()
+    fun evaluate(): T = value
 
     operator fun invoke(): T = evaluate()
 }
