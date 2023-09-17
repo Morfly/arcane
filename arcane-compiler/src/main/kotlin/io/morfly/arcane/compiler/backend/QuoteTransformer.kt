@@ -35,7 +35,7 @@ class QuoteTransformer(
     private val quoteType = pluginContext
         .referenceClass(ClassId(FqName(RUNTIME_PACKAGE), Name.identifier("Quote")))!!
 
-    private val quoteCodeSetter = quoteType.getSimpleFunction("addCode")
+    private val quoteCodeSetter = quoteType.getSimpleFunction("addCode")!!
 
     fun lower() {
         irFile.transformChildren(transformer = this, data = null)
@@ -86,7 +86,7 @@ class QuoteTransformer(
             }
             concat.addArgument(irString(fileSource.substring(lastOffset, rangeInfo.endOffset)))
 
-            val callSetter = irCall(quoteCodeSetter!!.owner).apply {
+            val callSetter = irCall(quoteCodeSetter.owner).apply {
                 dispatchReceiver = irGet(expression.function.extensionReceiverParameter!!)
             }
             callSetter.putValueArgument(0, concat)
