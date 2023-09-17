@@ -38,7 +38,6 @@ class QuoteTransformer(
     private val quoteCodeSetter = quoteType.getSimpleFunction("addCode")
 
     fun lower() {
-        println("TTAGG file: ${irFile.dump()}")
         irFile.transformChildren(transformer = this, data = null)
     }
 
@@ -79,7 +78,7 @@ class QuoteTransformer(
 
             val concat = irConcat()
             var lastOffset = rangeInfo.startOffset
-            data.splices.forEachIndexed { i, splice: IrCall ->
+            data.splices.forEach { splice: IrCall ->
                 val spliceRangeInfo = irFile.fileEntry.getSourceRangeInfo(splice.startOffset, splice.endOffset)
                 concat.addArgument(irString(fileSource.substring(lastOffset, spliceRangeInfo.startOffset)))
                 concat.addArgument(lowerSplice(splice))
