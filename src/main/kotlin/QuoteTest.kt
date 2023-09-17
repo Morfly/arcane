@@ -1,15 +1,16 @@
 import io.morfly.arcane.runtime.quote
 import io.morfly.arcane.runtime.splice
-import java.lang.StringBuilder
 
 fun test() {
     val code = quote {
 
-        //
-        var s = 5
-        s = 7
-        StringBuilder().append("123")
-
+        val s = splice {
+            5 + 5
+        }
+        val d = splice {
+            10 * 2
+        }
+        s + d
     }
     println("TTAGG text: \n${code.text}")
     println("TTAGG value: ${code.evaluate()}")

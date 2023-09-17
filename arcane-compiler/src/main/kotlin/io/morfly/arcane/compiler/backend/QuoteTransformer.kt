@@ -4,23 +4,18 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.ir.SourceRangeInfo
 import org.jetbrains.kotlin.ir.backend.js.utils.valueArguments
-import org.jetbrains.kotlin.ir.builders.irBlockBody
-import org.jetbrains.kotlin.ir.builders.irCall
-import org.jetbrains.kotlin.ir.builders.irGet
-import org.jetbrains.kotlin.ir.builders.irString
+import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.path
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
-import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
-import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
-import org.jetbrains.kotlin.ir.util.getSimpleFunction
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import java.io.File
+import java.lang.StringBuilder
+import kotlin.math.exp
 
 
 const val RUNTIME_PACKAGE = "io.morfly.arcane.runtime"
@@ -39,6 +34,7 @@ class QuoteTransformer(
     private val quoteCodeSetter = quoteType.getSimpleFunction("addCode")
 
     fun lower() {
+        println("TTAGG file: ${irFile.dump()}")
         irFile.transformChildren(transformer = this, data = null)
     }
 
@@ -62,7 +58,7 @@ class QuoteTransformer(
                     val body = expression.valueArguments.filterIsInstance<IrFunctionExpression>().firstOrNull()
 
                     if (body != null) {
-                        data.nestedSplices += lowerSplice(expression, body)
+                        data.splices += expression
                     }
                 } else {
                     error("TODO")
@@ -79,12 +75,38 @@ class QuoteTransformer(
             val rangeInfo = irFile.fileEntry.getSourceRangeInfo(expression.startOffset + 1, expression.endOffset - 1)
             val startIndent = " ".repeat(rangeInfo.startColumnNumber)
 
-            val code = startIndent + fileSource.substring(rangeInfo.startOffset, rangeInfo.endOffset)
+            val concat = irConcat()
+            var lastOffset = rangeInfo.startOffset
+            data.splices.forEachIndexed { i, splice: IrCall ->
+                val spliceRangeInfo = irFile.fileEntry.getSourceRangeInfo(splice.startOffset, splice.endOffset)
+                concat.addArgument(irString(fileSource.substring(lastOffset, spliceRangeInfo.startOffset)))
+                concat.addArgument(irCall(splice, splice.symbol))
+                lastOffset = spliceRangeInfo.endOffset
+            }
+            concat.addArgument(irString(fileSource.substring(lastOffset, rangeInfo.endOffset)))
+
+//            val spliceRangeInfo = data.nestedSplices.first().originalRangeInfo
+//
+//            val concat = irConcat()
+//            val fragment1 = buildString {
+//                append(startIndent)
+//                append(fileSource.substring(rangeInfo.startOffset, spliceRangeInfo.startOffset))
+//            }
+//            concat.addArgument(irString(fragment1))
+//
+//            concat.addArgument(irCall(data.nestedSplices.first().expression, data.nestedSplices.first().expression.symbol))
+//
+//            val fragment2 = buildString {
+//                append(fileSource.substring(spliceRangeInfo.endOffset, rangeInfo.endOffset))
+//            }
+//            concat.addArgument(irString(fragment2))
+//
+//            println("TTAGG concat: ${concat.dump()}")
 
             val callSetter = irCall(quoteCodeSetter!!.owner).apply {
                 dispatchReceiver = irGet(expression.function.extensionReceiverParameter!!)
             }
-            callSetter.putValueArgument(0, irString(code.trimIndent().trim('\n')))
+            callSetter.putValueArgument(0, concat)
             +callSetter
         }
         loweredBody.statements += body.statements
@@ -93,26 +115,9 @@ class QuoteTransformer(
         body.statements.addAll(loweredBody.statements)
     }
 
-    private fun lowerSplice(expression: IrCall, body: IrFunctionExpression): ModifiedIrExpression {
-        val rangeInfo = irFile.fileEntry.getSourceRangeInfo(expression.startOffset, expression.endOffset)
-        return ModifiedIrExpression(
-            originalRangeInfo = rangeInfo,
-            expression = expression,
-        )
-    }
-
     sealed interface Data
 }
 
 data class QuoteData(
-    val nestedSplices: MutableList<ModifiedIrExpression> = mutableListOf()
+    val splices: MutableList<IrCall> = mutableListOf()
 ) : QuoteTransformer.Data
-
-data class SpliceData(
-    val nestedQuotes: MutableList<ModifiedIrExpression> = mutableListOf()
-) : QuoteTransformer.Data
-
-data class ModifiedIrExpression(
-    val originalRangeInfo: SourceRangeInfo,
-    val expression: IrExpression,
-)
