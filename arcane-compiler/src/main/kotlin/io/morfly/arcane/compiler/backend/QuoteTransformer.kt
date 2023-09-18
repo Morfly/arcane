@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.ir.util.irCall
@@ -20,8 +19,8 @@ import java.io.File
 
 
 const val RUNTIME_PACKAGE = "io.morfly.arcane.runtime"
-val QUOTE_FQ_NAME = FqName("io.morfly.arcane.runtime.quote")
-val SPLICE_FQ_NAME = FqName("io.morfly.arcane.runtime.splice")
+val QUOTE_FQ_NAME = FqName("$RUNTIME_PACKAGE.quote")
+val SPLICE_FQ_NAME = FqName("$RUNTIME_PACKAGE.splice")
 
 class QuoteTransformer(
     private val pluginContext: IrPluginContext,
@@ -73,10 +72,12 @@ class QuoteTransformer(
         val body = expression.function.body as? IrBlockBody ?: return
 
         val loweredBody = DeclarationIrBuilder(pluginContext, expression.function.symbol).irBlockBody {
-            val rangeInfo = irFile.fileEntry.getSourceRangeInfo(expression.startOffset + 1, expression.endOffset - 1)
-            val startIndent = " ".repeat(rangeInfo.startColumnNumber)
-
             val concat = irConcat()
+            val rangeInfo = irFile.fileEntry.getSourceRangeInfo(expression.startOffset + 1, expression.endOffset - 1)
+
+            val startIndent = " ".repeat(rangeInfo.startColumnNumber)
+            concat.addArgument(irString(startIndent))
+
             var lastOffset = rangeInfo.startOffset
             data.splices.forEach { splice: IrCall ->
                 val spliceRangeInfo = irFile.fileEntry.getSourceRangeInfo(splice.startOffset, splice.endOffset)

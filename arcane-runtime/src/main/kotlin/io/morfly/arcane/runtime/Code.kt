@@ -13,7 +13,7 @@ class Code<T> internal constructor(
     val text: String
         get() {
             value
-            return quote.code!!
+            return quote.code!!.trimIndent()
         }
 
     fun evaluate(): T = value

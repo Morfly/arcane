@@ -5,7 +5,6 @@ fun getBool() = false
 
 fun test() {
     val code = quote {
-
         val s = splice {
             -10 + 5
         } + splice {
