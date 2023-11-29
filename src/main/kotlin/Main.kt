@@ -5,11 +5,11 @@ fun main() {
     val text = "5 + ${5 * 4}"
     println(text)
 
-    val value = 5 + run { 5 * 4 }
-    println(value)
-
     val code = quote {
-        val number = 5 + splice { 5 * 4 }
+        5 + splice { 5 * 4 }
     }
     println(code.text)
+
+    val value = 5 + run { 5 * 4 }
+    println(value)
 }
