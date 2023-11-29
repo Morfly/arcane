@@ -2,11 +2,11 @@ import io.morfly.arcane.runtime.quote
 import io.morfly.arcane.runtime.splice
 
 fun main() {
-    val text = "100 + ${5 * 4}"
+    val text = "val number = 100 + ${5 * 4}"
     println(text)
 
     val code = quote {
-        100 + splice { 5 * 4 }
+        val number = 100 + splice { 5 * 4 }
     }
     println(code.text)
 
