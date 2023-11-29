@@ -1,14 +1,15 @@
-import io.morfly.arcane.QuoteContent
 import io.morfly.arcane.runtime.quote
 import io.morfly.arcane.runtime.splice
 
-fun main(args: Array<String>) {
-    test()
+fun main() {
+    val text = "5 + ${5 * 4}"
+    println(text)
 
-//    quote {
-//        splice {
-//            println("TEST")
-//            quote @QuoteContent("") { }
-//        }
-//    }
+    val value = 5 + run { 5 * 4 }
+    println(value)
+
+    val code = quote {
+        val number = 5 + splice { 5 * 4 }
+    }
+    println(code.text)
 }
